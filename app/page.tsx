@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image";
 import { useEffect } from "react"
 import { useSession } from "next-auth/react"
 
@@ -11,7 +10,6 @@ export default function Home() {
   useEffect(() => {
     const fetchProfile = async () => {
       const profile = await fetch("/api/user/profile")
-      console.log(profile)
     }
     fetchProfile()
   }, [])

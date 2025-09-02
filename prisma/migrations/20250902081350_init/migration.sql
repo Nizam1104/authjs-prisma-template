@@ -1,19 +1,15 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "public"."User" (
+    "id" TEXT NOT NULL,
+    "name" TEXT,
+    "email" TEXT NOT NULL,
+    "emailVerified" TIMESTAMP(3),
+    "image" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-  - You are about to drop the column `dpUrl` on the `User` table. All the data in the column will be lost.
-  - You are about to drop the column `user_id` on the `User` table. All the data in the column will be lost.
-  - Added the required column `updatedAt` to the `User` table without a default value. This is not possible if the table is not empty.
-
-*/
--- AlterTable
-ALTER TABLE "public"."User" DROP COLUMN "dpUrl",
-DROP COLUMN "user_id",
-ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-ADD COLUMN     "emailVerified" TIMESTAMP(3),
-ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
-ALTER COLUMN "name" DROP NOT NULL,
-ALTER COLUMN "image" DROP NOT NULL;
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "public"."Account" (
@@ -65,6 +61,9 @@ CREATE TABLE "public"."Authenticator" (
 
     CONSTRAINT "Authenticator_pkey" PRIMARY KEY ("userId","credentialID")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Session_sessionToken_key" ON "public"."Session"("sessionToken");

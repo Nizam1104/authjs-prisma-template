@@ -36,17 +36,21 @@
 // },
 // });
 
+import { prisma } from "@/lib/prisma-client"
+
 
 import NextAuth from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
-import { SupabaseAdapter } from "@auth/supabase-adapter"
-import jwt from "jsonwebtoken"
+// import { SupabaseAdapter } from "@auth/supabase-adapter"
+// import jwt from "jsonwebtoken"
+import { PrismaAdapter } from "@auth/prisma-adapter"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: SupabaseAdapter({
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-    secret: process.env.SUPABASE_SERVICE_ROLE_KEY || "", // Use service role key, not anon key
-  }),
+  // adapter: SupabaseAdapter({
+  //   url: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  //   secret: process.env.SUPABASE_SERVICE_ROLE_KEY || "", // Use service role key, not anon key
+  // }),
+  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt"
   },
@@ -68,17 +72,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       // Create Supabase JWT token
-      const signingSecret = process.env.SUPABASE_JWT_SECRET
-      if (signingSecret && token.sub) {
-        const payload = {
-          aud: "authenticated",
-          exp: Math.floor(new Date(session.expires).getTime() / 1000),
-          sub: token.sub, // Use token.sub instead of user.id
-          email: session.user?.email,
-          role: "authenticated",
-        }
-        session.supabaseAccessToken = jwt.sign(payload, signingSecret)
-      }
+      // const signingSecret = process.env.SUPABASE_JWT_SECRET
+      // if (signingSecret && token.sub) {
+      //   const payload = {
+      //     aud: "authenticated",
+      //     exp: Math.floor(new Date(session.expires).getTime() / 1000),
+      //     sub: token.sub, // Use token.sub instead of user.id
+      //     email: session.user?.email,
+      //     role: "authenticated",
+      //   }
+      //   session.supabaseAccessToken = jwt.sign(payload, signingSecret)
+      // }
       // Send properties to the client
       session.accessToken = token.accessToken
       session.user.id = token.sub
@@ -86,7 +90,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   pages: {
-    error: '/auth/error', // Custom error page (optional)
+    error: 'api/auth/error', // Custom error page (optional)
+    signIn: '/login'
   },
   debug: process.env.NODE_ENV === 'development', // Enable debug in development
 });

@@ -7,15 +7,23 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-
-model users {
+        
+model User {
   id            String          @id @default(cuid())
   name          String?
   email         String          @unique
+  emailVerified DateTime?
   image         String?
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
  
-model accounts {
+model Account {
   userId            String
   type              String
   provider          String
@@ -31,20 +39,22 @@ model accounts {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
  
   @@id([provider, providerAccountId])
 }
  
-model sessions {
+model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
  
-model verificationTokens {
+model VerificationToken {
   identifier String
   token      String
   expires    DateTime
@@ -53,7 +63,7 @@ model verificationTokens {
 }
  
 // Optional for WebAuthn support
-model authenticators {
+model Authenticator {
   credentialID         String  @unique
   userId               String
   providerAccountId    String
@@ -63,6 +73,7 @@ model authenticators {
   credentialBackedUp   Boolean
   transports           String?
  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
  
   @@id([userId, credentialID])
 }
